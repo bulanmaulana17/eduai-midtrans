@@ -1,51 +1,51 @@
+// api/create-transaction.js
 import midtransClient from 'midtrans-client';
 
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    // Inisialisasi Snap Midtrans
-    let snap = new midtransClient.Snap({
-      isProduction: false, // Gunakan false untuk mode sandbox
+    const { planType, isYearly, amount, userDetails } = req.body;
+    
+    // Initialize Midtrans client
+    const snap = new midtransClient.Snap({
+      isProduction: false, // Ganti ke true untuk production
       serverKey: process.env.MIDTRANS_SERVER_KEY,
       clientKey: process.env.MIDTRANS_CLIENT_KEY
     });
 
-    // Data dari frontend
-    const { planType, isYearly, amount, userDetails } = req.body;
-
-    // Buat ID transaksi unik
-    const orderId = `EDUAI-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-    // Parameter transaksi
+    // Create transaction parameters
     const parameter = {
       transaction_details: {
-        order_id: orderId,
+        order_id: `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         gross_amount: amount
+      },
+      credit_card: {
+        secure: true
+      },
+      customer_details: {
+        first_name: userDetails.name,
+        email: userDetails.email,
+        phone: '08123456789' // Anda bisa menambahkan dari user profile
       },
       item_details: [{
         id: planType,
         price: amount,
         quantity: 1,
-        name: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan (${isYearly ? 'Tahunan' : 'Bulanan'})`,
-        category: 'Digital Subscription'
-      }],
-      customer_details: {
-        first_name: userDetails.name || 'Customer',
-        email: userDetails.email || 'customer@example.com',
-        phone: '08123456789'
-      }
+        name: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan (${isYearly ? 'Tahunan' : 'Bulanan'})`
+      }]
     };
 
-    // Buat transaksi token
+    // Create transaction
     const transaction = await snap.createTransaction(parameter);
     
-    // Kirim token ke frontend
     res.status(200).json({
-      transactionToken: transaction.token,
-      redirectUrl: transaction.redirect_url
+      transactionToken: transaction.token
     });
-    
   } catch (error) {
     console.error('Error creating transaction:', error);
-    res.status(500).json({ error: 'Failed to create transaction' });
+    res.status(500).json({ error: error.message });
   }
 }
