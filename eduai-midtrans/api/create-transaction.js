@@ -3,7 +3,7 @@ import midtransClient from 'midtrans-client';
 
 export default async function handler(req, res) {
   // 1. TAMBAHKAN HEADER CORS DI SINI (SEBELUM PROSES UTAMA)
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://eduai-generator.vercel.app');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
