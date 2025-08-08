@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/create-transaction",
+      "dest": "/api/create-transaction.js",
+      "methods": ["POST"]
+    }
+  ],
+  "env": {
+    "MIDTRANS_SERVER_KEY": "@midtrans-server-key",
+    "MIDTRANS_CLIENT_KEY": "@midtrans-client-key"
+  }
+}
