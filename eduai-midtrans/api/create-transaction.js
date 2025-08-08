@@ -2,6 +2,17 @@
 import midtransClient from 'midtrans-client';
 
 export default async function handler(req, res) {
+  // 1. TAMBAHKAN HEADER CORS DI SINI (SEBELUM PROSES UTAMA)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // 2. Handle preflight request (OPTIONS method)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // 3. Pastikan hanya menerima POST request
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -11,34 +22,13 @@ export default async function handler(req, res) {
     
     // Initialize Midtrans client
     const snap = new midtransClient.Snap({
-      isProduction: false, // Ganti ke true untuk production
+      isProduction: false,
       serverKey: process.env.MIDTRANS_SERVER_KEY,
       clientKey: process.env.MIDTRANS_CLIENT_KEY
     });
 
-    // Create transaction parameters
-    const parameter = {
-      transaction_details: {
-        order_id: `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        gross_amount: amount
-      },
-      credit_card: {
-        secure: true
-      },
-      customer_details: {
-        first_name: userDetails.name,
-        email: userDetails.email,
-        phone: '08123456789' // Anda bisa menambahkan dari user profile
-      },
-      item_details: [{
-        id: planType,
-        price: amount,
-        quantity: 1,
-        name: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan (${isYearly ? 'Tahunan' : 'Bulanan'})`
-      }]
-    };
+    // ... (kode Midtrans yang sudah ada) ...
 
-    // Create transaction
     const transaction = await snap.createTransaction(parameter);
     
     res.status(200).json({
