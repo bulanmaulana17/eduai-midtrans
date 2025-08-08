@@ -1,0 +1,7 @@
+{
+  "name": "eduai-midtrans",
+  "version": "1.0.0",
+  "dependencies": {
+    "midtrans-client": "^3.1.2"
+  }
+}
